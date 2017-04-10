@@ -104,7 +104,7 @@ def encode_value(v):
         xml = build('bool', str(v).lower())
         xml.text = str(v)
         return xml
-    elif isinstance(v, str):
+    elif isinstance(v, str) or isinstance(v, unicode):
         xml = build('string')
         xml.text = v
         return xml
@@ -244,7 +244,7 @@ def cur_state():
 
 def advance(cmd, encoding = 'utf-8'):
     global state_id
-    r = call('Add', ((cmd, -1), (cur_state(), True)), encoding)
+    r = call('Add', ((cmd.decode(encoding), -1), (cur_state(), True)), encoding)
     if r is None:
         return r
     if isinstance(r, Err):
