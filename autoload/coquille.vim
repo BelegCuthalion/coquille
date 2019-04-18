@@ -61,10 +61,18 @@ function! coquille#FNMapping()
     map <buffer> <silent> <F2> :CoqUndo<CR>
     map <buffer> <silent> <F3> :CoqNext<CR>
     map <buffer> <silent> <F4> :CoqToCursor<CR>
+    map <buffer> <silent> <F5> :call coquille#RawQuery("Check " . VisualSelection() . ".")<CR>
+    map <buffer> <silent> <F6> :call coquille#RawQuery("Print " . VisualSelection() . ".")<CR>
+    map <buffer> <silent> <F7> :call coquille#RawQuery("Search " . VisualSelection() . ".")<CR>
+    map <buffer> <silent> <F12> :CoqKill<CR>
 
     imap <buffer> <silent> <F2> <C-\><C-o>:CoqUndo<CR>
     imap <buffer> <silent> <F3> <C-\><C-o>:CoqNext<CR>
     imap <buffer> <silent> <F4> <C-\><C-o>:CoqToCursor<CR>
+    imap <buffer> <silent> <F5> :call coquille#RawQuery("Check " . VisualSelection() . ".")<CR>
+    imap <buffer> <silent> <F6> :call coquille#RawQuery("Print " . VisualSelection() . ".")<CR>
+    imap <buffer> <silent> <F7> :call coquille#RawQuery("Search " . VisualSelection() . ".")<CR>
+    imap <buffer> <silent> <F12> :CoqKill<CR>
 endfunction
 
 function! coquille#CoqideMapping()
@@ -123,4 +131,25 @@ function! coquille#Register()
     let b:errors  = -1
 
     command! -bar -buffer -nargs=* -complete=file CoqLaunch call coquille#Launch(<f-args>)
+endfunction
+
+function! VisualSelection()
+    if mode()=="v"
+        let [line_start, column_start] = getpos("v")[1:2]
+        let [line_end, column_end] = getpos(".")[1:2]
+    else
+        let [line_start, column_start] = getpos("'<")[1:2]
+        let [line_end, column_end] = getpos("'>")[1:2]
+    end
+    if (line2byte(line_start)+column_start) > (line2byte(line_end)+column_end)
+        let [line_start, column_start, line_end, column_end] =
+        \   [line_end, column_end, line_start, column_start]
+    end
+    let lines = getline(line_start, line_end)
+    if len(lines) == 0
+            return ''
+    endif
+    let lines[-1] = lines[-1][: column_end - 1]
+    let lines[0] = lines[0][column_start - 1:]
+    return join(lines, "\n")
 endfunction
