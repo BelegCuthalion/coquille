@@ -25,6 +25,9 @@ py if not vim.eval("s:current_dir") in sys.path:
 \    sys.path.append(vim.eval("s:current_dir")) 
 py import coquille
 
+hi Vertsplit cterm=NONE
+hi StatusLineNC cterm=NONE
+
 function! coquille#ShowPanels()
     " open the Goals & Infos panels before going back to the main window
     let l:winnb = winnr()
